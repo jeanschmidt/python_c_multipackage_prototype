@@ -20,16 +20,21 @@ if not os.path.exists(_build_path):
 if not os.path.exists(_build_path):
     raise FileNotFoundError(f"Could not find build directory at {_build_path}")
 
-# Need to load libmessage.so which depends on libmessage-internal.so
-_lib_path = os.path.join(_build_path, 'libmessage.so')
+# Define the library paths
+_internal_lib_path = os.path.join(_build_path, 'libmessage-internal.so')
+_main_lib_path = os.path.join(_build_path, 'libmessage.so')
 
-# Load the library
+# Load the libraries
 try:
-    # Load the main library - it will automatically find the dependency in the same directory
-    _lib = ctypes.CDLL(_lib_path)
-    print(f"Loaded library from: {_lib_path}")
+    # First load the internal library with RTLD_GLOBAL flag to make its symbols available
+    ctypes.CDLL(_internal_lib_path, mode=ctypes.RTLD_GLOBAL)
+    print(f"Loaded internal library from: {_internal_lib_path}")
+
+    # Now load the main library - it will find symbols in the globally loaded internal library
+    _lib = ctypes.CDLL(_main_lib_path)
+    print(f"Loaded main library from: {_main_lib_path}")
 except Exception as e:
-    print(f"Failed to load C library from {_lib_path}: {e}", file=sys.stderr)
+    print(f"Failed to load C library: {e}", file=sys.stderr)
     raise
 
 print_message = _lib.print_message

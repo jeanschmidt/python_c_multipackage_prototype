@@ -2,7 +2,7 @@
 
 # Compiler settings
 CC = gcc
-CFLAGS = -Wall -fPIC
+CFLAGS = -Wall -fPIC -Wl,--unresolved-symbols=ignore-all
 
 # Directories
 SRC_DIR = src
@@ -18,11 +18,11 @@ SRC_LIBMESSAGE_INTERNAL = $(SRC_DIR)/message_default_imp.c
 
 all: $(TARGET_LIBMESSAGE) $(TARGET_LIBMESSAGE_INTERNAL)
 
-$(TARGET_LIBMESSAGE_INTERNAL): $(SRC_LIBMESSAGE_INTERNAL) | $(BUILD_DIR)
+$(TARGET_LIBMESSAGE): $(SRC_LIBMESSAGE) | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -shared -o $@ $^
 
-$(TARGET_LIBMESSAGE): $(SRC_LIBMESSAGE) $(TARGET_LIBMESSAGE_INTERNAL) | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -shared -o $@ $< -L$(BUILD_DIR) -lmessage-internal -Wl,-rpath,'$$ORIGIN'
+$(TARGET_LIBMESSAGE_INTERNAL): $(SRC_LIBMESSAGE_INTERNAL) | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -shared -o $@ $^
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
