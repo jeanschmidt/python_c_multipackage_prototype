@@ -3,5 +3,5 @@ __pycache__
 .venv
 *.egg-info
 *.so
-python_poc/python_load_poc_c_extension/build
-python_poc/test_env
+build/
+test_env/
