@@ -1,0 +1,2 @@
+include python_load_poc_alt_c_extension/build/libmessage-internal.so
+recursive-include python_load_poc_alt_c_extension/build *
