@@ -1,6 +1,6 @@
-#include <stdio.h>
+#include "message_internal.h"
 
 // Simple C function that prints a message
 void print_message() {
-    printf("Hello from C function!\n");
+    do_message_print("Hello from C function!\n");
 }

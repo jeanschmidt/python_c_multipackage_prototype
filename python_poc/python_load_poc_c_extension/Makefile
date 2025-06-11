@@ -9,15 +9,20 @@ SRC_DIR = src
 BUILD_DIR = build
 
 # Target library name
-TARGET = $(BUILD_DIR)/libmessage.so
+TARGET_LIBMESSAGE = $(BUILD_DIR)/libmessage.so
+TARGET_LIBMESSAGE_INTERNAL = $(BUILD_DIR)/libmessage-internal.so
 
 # Source files
-SRC = $(SRC_DIR)/message.c
+SRC_LIBMESSAGE = $(SRC_DIR)/message.c
+SRC_LIBMESSAGE_INTERNAL = $(SRC_DIR)/message_default_imp.c
 
-all: $(TARGET)
+all: $(TARGET_LIBMESSAGE) $(TARGET_LIBMESSAGE_INTERNAL)
 
-$(TARGET): $(SRC) | $(BUILD_DIR)
+$(TARGET_LIBMESSAGE_INTERNAL): $(SRC_LIBMESSAGE_INTERNAL) | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -shared -o $@ $^
+
+$(TARGET_LIBMESSAGE): $(SRC_LIBMESSAGE) $(TARGET_LIBMESSAGE_INTERNAL) | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -shared -o $@ $< -L$(BUILD_DIR) -lmessage-internal -Wl,-rpath,'$$ORIGIN'
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
