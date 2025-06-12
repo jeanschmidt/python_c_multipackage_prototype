@@ -1,8 +1,19 @@
 # Makefile for compiling the C library
 
+# Determine OS type
+UNAME_S := $(shell uname -s)
+
 # Compiler settings
-CC = gcc
-CFLAGS = -Wall -fPIC -Wl,--unresolved-symbols=ignore-all
+ifeq ($(UNAME_S),Darwin)
+	# macOS settings
+	CC = clang
+	# macOS equivalent for ignoring unresolved symbols is -undefined dynamic_lookup
+	CFLAGS = -Wall -fPIC -Wl,-undefined,dynamic_lookup
+else
+	# Linux settings
+	CC = gcc
+	CFLAGS = -Wall -fPIC -Wl,--unresolved-symbols=ignore-all
+endif
 
 # Directories
 SRC_DIR = src

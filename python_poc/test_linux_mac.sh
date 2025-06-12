@@ -44,4 +44,4 @@ popd
 
 # Cleanup
 deactivate
-. ./cleanup_linux.sh
+. ./cleanup_linux_mac.sh
