@@ -17,15 +17,16 @@ TARGET_LIBMESSAGE_INTERNAL = $(BUILD_DIR)\message-internal.dll
 SRC_LIBMESSAGE = $(SRC_DIR)\message.c
 SRC_LIBMESSAGE_INTERNAL = $(SRC_DIR)\message_default_imp.c
 
-all: $(BUILD_DIR) $(TARGET_LIBMESSAGE) $(TARGET_LIBMESSAGE_INTERNAL)
+all: $(BUILD_DIR) $(TARGET_LIBMESSAGE_INTERNAL) $(TARGET_LIBMESSAGE)
 
-# Windows needs both files built together
+# Build the internal implementation first
 $(TARGET_LIBMESSAGE_INTERNAL): $(SRC_LIBMESSAGE_INTERNAL)
 	$(CC) $(CFLAGS) /LD $(SRC_LIBMESSAGE_INTERNAL) /Fe$(TARGET_LIBMESSAGE_INTERNAL)
 
-# Link against the internal implementation
-$(TARGET_LIBMESSAGE): $(SRC_LIBMESSAGE) $(SRC_LIBMESSAGE_INTERNAL)
-	$(CC) $(CFLAGS) /LD $(SRC_LIBMESSAGE) $(SRC_LIBMESSAGE_INTERNAL) /Fe$(TARGET_LIBMESSAGE)
+# Build the main DLL with unresolved symbols (similar to Linux/macOS approach)
+# /FORCE:UNRESOLVED allows unresolved external symbols
+$(TARGET_LIBMESSAGE): $(SRC_LIBMESSAGE)
+	$(CC) $(CFLAGS) /LD $(SRC_LIBMESSAGE) /Fe$(TARGET_LIBMESSAGE) /link /FORCE:UNRESOLVED
 
 $(BUILD_DIR):
 	if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
