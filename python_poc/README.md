@@ -8,4 +8,4 @@ Use `ctypes.CDLL` with flag `ctypes.RTLD_GLOBAL` to dynamically load dependencie
 
 ## Status
 
-Currently this approach is proven to Linux, next steps would be to validate them in Windows and MacOS systems.
+Working on Linux, MacOS and Windows
