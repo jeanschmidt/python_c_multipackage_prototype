@@ -1,0 +1,37 @@
+# Windows Makefile for C extension
+
+# Compiler settings
+CC = cl
+# Use static linking to avoid LIBCMT.lib issues
+CFLAGS = /nologo /DBUILDING_DLL /EHsc /W3 /D_CRT_SECURE_NO_WARNINGS /MT
+
+# Directories
+SRC_DIR = src
+BUILD_DIR = build
+
+# Target library names
+TARGET_LIBMESSAGE = $(BUILD_DIR)\message.dll
+TARGET_LIBMESSAGE_INTERNAL = $(BUILD_DIR)\message-internal.dll
+
+# Source files
+SRC_LIBMESSAGE = $(SRC_DIR)\message.c
+SRC_LIBMESSAGE_INTERNAL = $(SRC_DIR)\message_default_imp.c
+
+all: $(BUILD_DIR) $(TARGET_LIBMESSAGE) $(TARGET_LIBMESSAGE_INTERNAL)
+
+# Windows needs both files built together
+$(TARGET_LIBMESSAGE_INTERNAL): $(SRC_LIBMESSAGE_INTERNAL)
+	$(CC) $(CFLAGS) /LD $(SRC_LIBMESSAGE_INTERNAL) /Fe$(TARGET_LIBMESSAGE_INTERNAL)
+
+# Link against the internal implementation
+$(TARGET_LIBMESSAGE): $(SRC_LIBMESSAGE) $(SRC_LIBMESSAGE_INTERNAL)
+	$(CC) $(CFLAGS) /LD $(SRC_LIBMESSAGE) $(SRC_LIBMESSAGE_INTERNAL) /Fe$(TARGET_LIBMESSAGE)
+
+$(BUILD_DIR):
+	if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+
+clean:
+	if exist $(BUILD_DIR)\*.dll del /Q $(BUILD_DIR)\*.dll
+	if exist $(BUILD_DIR)\*.obj del /Q $(BUILD_DIR)\*.obj
+	if exist $(BUILD_DIR)\*.lib del /Q $(BUILD_DIR)\*.lib
+	if exist $(BUILD_DIR)\*.exp del /Q $(BUILD_DIR)\*.exp
