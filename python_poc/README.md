@@ -22,8 +22,13 @@ pip3 install torch-cuda
 
 And the already-existing library in the system should now use the newer binaries provided in `torch-cuda`.
 
-The goal is to leverage also the approach provided by Eli to use what he called (torchpick)[https://github.com/seemethere/torchpick]
+The goal is to leverage also the approach provided by Eli to use what he called [torchpick](https://github.com/seemethere/torchpick)
 
+```
+pip3 install torch[cpu]
+# OR
+pip3 install torch[cuda]
+```
 
 ## Status
 
