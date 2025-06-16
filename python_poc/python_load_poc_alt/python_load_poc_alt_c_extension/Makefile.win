@@ -1,0 +1,35 @@
+# Windows Makefile for C extension (Alternative implementation)
+
+# Compiler settings
+CC = cl
+# Use static linking to avoid LIBCMT.lib issues
+CFLAGS = /nologo /DBUILDING_DLL /EHsc /W3 /D_CRT_SECURE_NO_WARNINGS /MT
+
+# Directories
+SRC_DIR = src
+BUILD_DIR = build
+
+# Target library name - only internal DLL for the alternative implementation
+TARGET_LIBMESSAGE_INTERNAL = $(BUILD_DIR)\message-internal.dll
+
+# Source files
+SRC_LIBMESSAGE_INTERNAL = $(SRC_DIR)\message_default_imp.c
+
+all: $(BUILD_DIR) $(TARGET_LIBMESSAGE_INTERNAL)
+
+# Build the internal implementation
+$(TARGET_LIBMESSAGE_INTERNAL): $(SRC_LIBMESSAGE_INTERNAL)
+	$(CC) $(CFLAGS) /LD $(SRC_LIBMESSAGE_INTERNAL) /Fe$(TARGET_LIBMESSAGE_INTERNAL)
+	@echo LIBRARY message-internal > message-internal.def
+	@echo EXPORTS >> message-internal.def
+	@echo do_message_print >> message-internal.def
+
+$(BUILD_DIR):
+	if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+
+clean:
+	if exist $(BUILD_DIR)\*.dll del /Q $(BUILD_DIR)\*.dll
+	if exist $(BUILD_DIR)\*.obj del /Q $(BUILD_DIR)\*.obj
+	if exist $(BUILD_DIR)\*.lib del /Q $(BUILD_DIR)\*.lib
+	if exist $(BUILD_DIR)\*.exp del /Q $(BUILD_DIR)\*.exp
+	if exist message-internal.def del message-internal.def
