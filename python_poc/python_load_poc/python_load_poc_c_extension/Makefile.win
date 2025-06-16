@@ -23,10 +23,14 @@ all: $(BUILD_DIR) $(TARGET_LIBMESSAGE_INTERNAL) $(TARGET_LIBMESSAGE)
 $(TARGET_LIBMESSAGE_INTERNAL): $(SRC_LIBMESSAGE_INTERNAL)
 	$(CC) $(CFLAGS) /LD $(SRC_LIBMESSAGE_INTERNAL) /Fe$(TARGET_LIBMESSAGE_INTERNAL)
 
-# Build the main DLL with unresolved symbols (similar to Linux/macOS approach)
-# /FORCE:UNRESOLVED allows unresolved external symbols
-$(TARGET_LIBMESSAGE): $(SRC_LIBMESSAGE)
-	$(CC) $(CFLAGS) /LD $(SRC_LIBMESSAGE) /Fe$(TARGET_LIBMESSAGE) /link /FORCE:UNRESOLVED
+# Build the main DLL with proper import library
+# We need to create an export for the internal DLL first to link against
+$(TARGET_LIBMESSAGE): $(SRC_LIBMESSAGE) $(TARGET_LIBMESSAGE_INTERNAL)
+	@echo LIBRARY message-internal > message-internal.def
+	@echo EXPORTS >> message-internal.def
+	@echo do_message_print >> message-internal.def
+	lib /def:message-internal.def /out:message-internal-import.lib /machine:x64
+	$(CC) $(CFLAGS) /LD $(SRC_LIBMESSAGE) /Fe$(TARGET_LIBMESSAGE) message-internal-import.lib
 
 $(BUILD_DIR):
 	if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
@@ -36,3 +40,5 @@ clean:
 	if exist $(BUILD_DIR)\*.obj del /Q $(BUILD_DIR)\*.obj
 	if exist $(BUILD_DIR)\*.lib del /Q $(BUILD_DIR)\*.lib
 	if exist $(BUILD_DIR)\*.exp del /Q $(BUILD_DIR)\*.exp
+	if exist message-internal.def del message-internal.def
+	if exist message-internal-import.lib del message-internal-import.lib
